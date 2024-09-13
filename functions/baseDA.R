@@ -1,9 +1,8 @@
-baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
-                   tiebreak='application',seed=1234,type='DA',
-                   get_assignment=T,get_cutoffs=T){
+baseDA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
+                  tiebreak='application',seed=1234,get_assignment=T,
+                  get_cutoffs=T){
   
   ## Validation:
-  if(!type %in% c('DA','Boston')){stop('Wrong type. Valids algorithms are "DA" and "Boston"')}
   if(!tiebreak %in% c('applicant','application')){stop('Wrong tiebreak. Valids are "applicant" and "application"')}
   
   ## Seeds:
@@ -64,15 +63,11 @@ baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
     assigned = NULL
     preference = 1
     it = 1
-    cat(paste0('\n        Starting ',type,' algorithm'))
+    cat(paste0('\n        Starting DA algorithm'))
     while(nrow(apps2) > 0){
       
       ## Filter:
-      if(type == 'DA'){
-        a <- apps2[ranking == 1 & !applicant_id %in% assigned$applicant_id,]
-      } else if(type == 'Boston') {
-        a <- apps2[ranking == preference,]
-      }
+      a <- apps2[ranking == 1 & !applicant_id %in% assigned$applicant_id,]
       
       ## Append:
       assigned <- rbind(assigned,a,fill=T)
@@ -81,29 +76,22 @@ baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
       assigned <- assigned[paste0(program_id,'-',seat_order) %in% paste0(vacs$program_id,'-',vacs$seat_order)]
       
       ## Drop:
-      if(type == 'DA'){
-        apps2 <- apps2[ranking > 1 | (applicant_id %in% assigned$applicant_id & ranking == 1),]
-        apps2 <- apps2[order(applicant_id,ranking)]
-        if(nrow(apps2) == 0){ 
+      apps2 <- apps2[ranking > 1 | (applicant_id %in% assigned$applicant_id & ranking == 1),]
+      apps2 <- apps2[order(applicant_id,ranking)]
+      if(nrow(apps2) == 0){ 
+        break
+      } else if(it > 1){
+        if(nrow(apps2) == td2){
+          rm(td2,a,it)
           break
-        } else if(it > 1){
-          if(nrow(apps2) == td2){
-            rm(td2,a,it)
-            break
-          }
         }
-        
-        ## New ranking
-        apps2[,ranking:=1:.N,by=.(applicant_id)]
-        td2 <- nrow(apps2)
-        it <- it + 1
-        rm(a)
-      } else if(type == 'Boston'){
-        apps2 <- apps2[ranking != preference,]
-        apps2 <- apps2[!applicant_id %in% assigned$applicant_id,]
-        preference <- preference + 1
-        rm(a) 
       }
+      
+      ## New ranking
+      apps2[,ranking:=1:.N,by=.(applicant_id)]
+      td2 <- nrow(apps2)
+      it <- it + 1
+      rm(a)
     }
     
     ## Add original ranking:
