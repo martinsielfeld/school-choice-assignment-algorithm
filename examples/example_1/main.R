@@ -39,13 +39,14 @@ sapply(packages,require,character.only=T,quietly=T)
 }
 
 ## Load function:
-source(paste0(mainFolder,'/functions/baseSAA.R'),encoding='UTF-8')
+source(paste0(mainFolder,'/functions/baseDA.R'),encoding='UTF-8')
+source(paste0(mainFolder,'/functions/baseBoston.R'),encoding='UTF-8')
 
 ## Execute base DA:
-results_DA = baseSAA(apps=applications,vacs=vacancies,type='DA',get_cutoffs=T)
+results_DA = baseDA(apps=applications,vacs=vacancies,get_cutoffs=T)
 
 ## Execute base Boston:
-results_Boston = baseSAA(apps=applications,vacs=vacancies,type='Boston',get_cutoffs=T)
+results_Boston = baseBoston(apps=applications,vacs=vacancies,get_cutoffs=T)
 
 ## Check:
 {
@@ -71,7 +72,7 @@ results_Boston = baseSAA(apps=applications,vacs=vacancies,type='Boston',get_cuto
 }
 
 ## Execute base DA:
-iters_DA = baseSAA(apps=applications,vacs=vacancies,type='DA',get_cutoffs=T,iters=100)
+iters_DA = baseDA(apps=applications,vacs=vacancies,get_cutoffs=T,iters=200)
 
 ## Cutoff distribution:
 {
