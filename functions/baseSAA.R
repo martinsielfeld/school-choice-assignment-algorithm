@@ -1,13 +1,20 @@
 baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
                    tiebreak='application',seed=1234,type='DA',
-                   get_assignment=T,get_cutoffs=T){
+                   get_assignment=T,get_cutoffs=T,rand_type='py&r'){
+  
+  ## Load functions:
+  source(paste0(mainFolder,'/functions/expandVacs.R'),encoding='UTF-8')
+  source(paste0(mainFolder,'/functions/lotteryNum.R'),encoding='UTF-8')
+  source(paste0(mainFolder,'/functions/Boston.R'),encoding='UTF-8')
+  source(paste0(mainFolder,'/functions/DA.R'),encoding='UTF-8')
+  source(paste0(mainFolder,'/functions/getCutoffs.R'),encoding='UTF-8')
   
   ## Validation:
   if(!type %in% c('DA','Boston')){stop('Wrong type. Valids algorithms are "DA" and "Boston"')}
   if(!tiebreak %in% c('applicant','application')){stop('Wrong tiebreak. Valids are "applicant" and "application"')}
   
   ## Seeds:
-  cat('Random numbers...')
+  cat('\nRandom numbers...')
   if(iters == 1){
     iter_seeds <- seed
   } else if (iters > 1){
@@ -17,9 +24,7 @@ baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
   }
   
   ## Supply:
-  cat('\nExpand vacancies...')
-  vacs <- vacs[regular_vacancies > 0]
-  vacs <- vacs[, .(seat_order = seq_len(regular_vacancies)), by = program_id]
+  vacs = expandVacs(vacs)
   
   ## Loop:
   cat('\nStart assignment...')
@@ -35,75 +40,13 @@ baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
     apps2 <- apps2[order(program_id,-applicant_id)]
     
     ## Add tiebreak:
-    if(!'lottery_number' %in% names(apps2)){ ## If not lottery number provided
-      apps2[,lottery_number:=NA]
-    }
-    
-    if(iters == 1 & any(is.na(apps2$lottery_number)) == F){ ## If lottery number provided, use it
-      cat(paste0('\n        Random numbers detected'))
-    } else if(iters > 1 | any(is.na(apps2$lottery_number)) == T){ ## If any lottery number provided, all new
-      cat(paste0('\n        Creating random numbers'))
-      v <- 1:nrow(apps2)
-      s <- SyncRNG(seed=iter_seeds[i])
-      apps2$lottery_number = s$shuffle(v)
-      apps2[,lottery_number := lottery_number/10^max(str_length(lottery_number))]
-      if(tiebreak == 'applicant'){ ## If one lottery number per applicant, first one
-        apps2[,lottery_number:=first(lottery_number),by=.(applicant_id)]
-      }
-    }
-    
-    ## Check tiebreak:
-    if(any(apps2[,.(count=.N),.(program_id,lottery_number)]$count != 1)){
-      stop('Repeated tiebreak in school - grade')
-    }
-    
-    ## Create score:
-    apps2[,score := priority_profile + lottery_number]
+    apps2 = lotteryNum(apps2,breaktype=tiebreak,type=rand_type,iterat=iters,seed=iter_seeds[i])
     
     ## Start iteration:
-    assigned = NULL
-    preference = 1
-    it = 1
-    cat(paste0('\n        Starting ',type,' algorithm'))
-    while(nrow(apps2) > 0){
-      
-      ## Filter:
-      if(type == 'DA'){
-        a <- apps2[ranking == 1 & !applicant_id %in% assigned$applicant_id,]
-      } else if(type == 'Boston') {
-        a <- apps2[ranking == preference,]
-      }
-      
-      ## Append:
-      assigned <- rbind(assigned,a,fill=T)
-      assigned <- assigned[order(program_id,-score,na.last=T)]
-      assigned[,seat_order:=1:.N,by=.(program_id)]
-      assigned <- assigned[paste0(program_id,'-',seat_order) %in% paste0(vacs$program_id,'-',vacs$seat_order)]
-      
-      ## Drop:
-      if(type == 'DA'){
-        apps2 <- apps2[ranking > 1 | (applicant_id %in% assigned$applicant_id & ranking == 1),]
-        apps2 <- apps2[order(applicant_id,ranking)]
-        if(nrow(apps2) == 0){ 
-          break
-        } else if(it > 1){
-          if(nrow(apps2) == td2){
-            rm(td2,a,it)
-            break
-          }
-        }
-        
-        ## New ranking
-        apps2[,ranking:=1:.N,by=.(applicant_id)]
-        td2 <- nrow(apps2)
-        it <- it + 1
-        rm(a)
-      } else if(type == 'Boston'){
-        apps2 <- apps2[ranking != preference,]
-        apps2 <- apps2[!applicant_id %in% assigned$applicant_id,]
-        preference <- preference + 1
-        rm(a) 
-      }
+    if(type == 'DA'){
+      assigned = DA(apps2,vacs)
+    } else if(type=='Boston'){
+      assigned = Boston(apps2,vacs)
     }
     
     ## Add original ranking:
@@ -111,30 +54,28 @@ baseSAA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
     assigned[,ranking:=NULL]
     assigned = merge(assigned,apps[,.(applicant_id,program_id,ranking)],by=c('applicant_id','program_id'))
     
-    ## Print:
+    ## Save cutoffs:
     if(get_cutoffs == T){
-      cat(paste0('\n        Get cutoffs'))
-      
-      cuts = vacs[,.(seat_order=max(seat_order)),by=.(program_id)]
-      cuts = merge(cuts,assigned[,.(program_id,seat_order,ranking,score)],
-                   by=c('program_id','seat_order'),all.x=T)
-      cuts[,not_filled:=ifelse(is.na(score),T,F)]
-      cuts[is.na(score),score:=1]
-      cuts = cuts[,.(iter=i,program_id,not_filled,ranking,score)]
-      cutoffs = rbind(cutoffs,cuts)
-      rm(cuts)
+      cutoffs = getCutoffs(assigned,vacs,cutoffs)
     }
     
-    ## Save iter results:
-    assigned = assigned[,.(iter,applicant_id,program_id,ranking,score)]
+    ## Save assignment:
     if(get_assignment==T){
+      assigned = assigned[,.(iter,applicant_id,program_id,ranking,score)]
       assignment = rbind(assignment,assigned) 
     }
-    rm(assigned)
   }
   
   ## Export results:
+  results = NULL
+  if(get_assignment == T){
+    results$assignment = assignment
+  }
+  if(get_cutoffs == T){
+    results$cutoffs = cutoffs
+  }
+  
   cat('\nEnd of simulations')
-  return(list('assignment'=assignment,'cutoffs'=cutoffs))
+  return(results)
   gc()
 }
