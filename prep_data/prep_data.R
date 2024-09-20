@@ -11,7 +11,7 @@
 ## Created: 2024/09/12
 ## Last edition: 2024/09/12
 ##
-## Source: Datos Abiertos MINEDUC
+## Source: Datos Abiertos MINEDUC - SAE 2020
 ##
 #####################################################################
 
@@ -53,18 +53,32 @@ sapply(packages,require,character.only=T,quietly=T)
   crosswalk = programs[,.(rbd,cod_curso,program_id)]
   
   ## Quotas:
-  programs = programs[,.(school_id=rbd,grade_id=cod_nivel,program_id,quota_1=vacantes_pie,quota_2=vacantes_alta_exigencia_r,
-                         quota_3=vacantes_prioritarios,regular_vacancies=vacantes_regular,total_vacancies=vacantes)]
+  programs = programs[,.(school_id=rbd,grade_id=cod_nivel,program_id,
+                         quota_1=vacantes_pie,
+                         quota_2=vacantes_alta_exigencia_r,
+                         quota_3=vacantes_prioritarios,
+                         regular_vacancies=vacantes_regular,
+                         total_vacancies=vacantes)]
   
   ## Applications:
   applications = merge(C1,B1,by=c('mrun','cod_nivel'))
   applications = merge(applications,crosswalk,by=c('rbd','cod_curso'))
   applications[,loteria_original:=loteria_original/10^max(str_length(loteria_original))]
   applications = applications[order(-cod_nivel,mrun,preferencia_postulante)]
-  applications = applications[,.(applicant_id=mrun,grade_id=cod_nivel,program_id,ranking=preferencia_postulante,
-                                 low_income=prioritario,special_needs=es_pie,high_perf_prio=alto_rendimiento,
-                                 staff_prio=prioridad_hijo_funcionario,ex_student_prio=prioridad_exalumno,
-                                 sibling_prio=prioridad_hermano,continuity_prio=agregada_por_continuidad,
+  applications = applications[,.(applicant_id=mrun,
+                                 grade_id=cod_nivel,
+                                 program_id,
+                                 ranking=preferencia_postulante,
+                                 low_income=prioritario,
+                                 special_needs=es_pie,
+                                 high_perf_prio=alto_rendimiento,
+                                 staff_prio=prioridad_hijo_funcionario,
+                                 ex_student_prio=prioridad_exalumno,
+                                 sibling_prio=prioridad_hermano,
+                                 continuity_prio=agregada_por_continuidad,
+                                 order_1=orden_pie,
+                                 order_2=orden_alta_exigencia_transicion,
+                                 order_3=NA,
                                  lottery_number=loteria_original)]
   
   ## Clean:
@@ -72,24 +86,49 @@ sapply(packages,require,character.only=T,quietly=T)
   gc()
 }
 
-## Example 1:
+## Example 1 - base algorithms:
 {
   ## Programs:
-  programs = programs[,.(school_id,grade_id,program_id,regular_vacancies=total_vacancies)]
+  programs1 = programs[,.(school_id,grade_id,program_id,regular_vacancies=total_vacancies)]
   
   ## Priority profile:
-  applications[sibling_prio == 1, priority_profile := 4]
-  applications[is.na(priority_profile) & staff_prio == 1, priority_profile := 3]
-  applications[is.na(priority_profile) & ex_student_prio, priority_profile := 2]
-  applications[is.na(priority_profile), priority_profile := 1]
-  applications = applications[,.(applicant_id,grade_id,program_id,ranking,priority_profile,lottery_number)]
+  applications1 = copy(applications)
+  applications1[sibling_prio == 1, priority_profile := 4]
+  applications1[is.na(priority_profile) & staff_prio == 1, priority_profile := 3]
+  applications1[is.na(priority_profile) & ex_student_prio, priority_profile := 2]
+  applications1[is.na(priority_profile), priority_profile := 1]
+  applications1 = applications1[,.(applicant_id,grade_id,program_id,ranking,priority_profile,lottery_number)]
   
   ## Check:
   table(applications$priority_profile,exclude=F)
   
   ## Export:
-  fwrite(programs,paste0(mainFolder,'/data/example_1/vacancies.csv'))
-  fwrite(applications,paste0(mainFolder,'/data/example_1/applications.csv'))
+  fwrite(programs1,paste0(mainFolder,'/data/example_1/vacancies.csv'))
+  fwrite(applications1,paste0(mainFolder,'/data/example_1/applications.csv'))
+  rm(applications1,programs1)
+}
+
+## Example 2 - quota:
+{
+  ## Programs:
+  programs2 = programs[,.(school_id,grade_id,program_id,regular_vacancies=total_vacancies)]
+  
+  ## Priority profile:
+  applications2 = copy(applications)
+  applications2[continuity_prio == 1, priority_profile := 5]
+  applications2[sibling_prio == 1, priority_profile := 4]
+  applications2[is.na(priority_profile) & staff_prio == 1, priority_profile := 3]
+  applications2[is.na(priority_profile) & ex_student_prio, priority_profile := 2]
+  applications2[is.na(priority_profile), priority_profile := 1]
+  applications2 = applications2[,.(applicant_id,grade_id,program_id,ranking,priority_profile,lottery_number)]
+  
+  ## Check:
+  table(applications$priority_profile,exclude=F)
+  
+  ## Export:
+  fwrite(programs2,paste0(mainFolder,'/data/example_2/vacancies.csv'))
+  fwrite(applications2,paste0(mainFolder,'/data/example_2/applications.csv'))
+  rm(applications2,programs2)
 }
 
 ## Clean:
