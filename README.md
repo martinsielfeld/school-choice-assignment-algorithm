@@ -3,11 +3,30 @@ Last stable release: 2024/09/16<br>
 Author: [Martin Sielfeld](https://github.com/martinsielfeld)<br>
 Contributors:<br>
 
-# School Choice Assignment Algorithms
+# Multipurpose Assignment Algorithms
 
-This repository aims to charactirize the use of different variations of the Boston Assignment Mechanism[^1] (Abdulkadiroğlu, A., & Sönmez, T.,2003) and the Deferred Acceptance Mechanism [^2] (Gale, D., & Shapley, L. S.,1962) in the context of school choice.
+This repository aims to charactirize the use of different variations of the Boston Assignment Mechanism[^1] (Abdulkadiroğlu, A., & Sönmez, T.,2003) and the Deferred Acceptance Mechanism [^2] (Gale, D., & Shapley, L. S.,1962) in the fields of education, housing and labor.
 
-## Priority Profile
+The following examples are included:
+
+  * Base Boston and DA algorithms.
+  * With secure enrollment priority.
+  * With hard and soft quoutas.
+  * With group application.
+
+## Functions
+
+### baseBoston
+
+Argument | Categories | Description
+-------- | ---------- | ----------
+
+### baseDA
+
+Argument | Categories | Description
+-------- | ---------- | ----------
+
+## Inputs
 
 [^1]: Abdulkadiroğlu, A., & Sönmez, T. (2003). School choice: A mechanism design approach. American economic review, 93(3), 729-747. https://doi.org/10.1257/000282803322157061
 
