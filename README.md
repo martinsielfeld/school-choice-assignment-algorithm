@@ -5,13 +5,13 @@ Contributors:<br>
 
 # Multipurpose Assignment Algorithms
 
-This repository aims to charactirize the use of different variations of the Boston Assignment Mechanism[^1] (Abdulkadiroğlu, A., & Sönmez, T.,2003) and the Deferred Acceptance Mechanism [^2] (Gale, D., & Shapley, L. S.,1962) in the fields of education, housing and labor.
+This repository charactirize the use of different variations of the Boston Assignment Mechanism[^1] (Abdulkadiroğlu, A., & Sönmez, T.,2003) and the Deferred Acceptance Mechanism [^2] (Gale, D., & Shapley, L. S.,1962) in the context of educational, housing and labor markets.
 
 The following examples are included:
 
   * Base Boston and DA algorithms.
   * With secure enrollment priority.
-  * With hard and soft quoutas.
+  * With hard and soft quotas.
   * With group application.
 
 ## Functions
