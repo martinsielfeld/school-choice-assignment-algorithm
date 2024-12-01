@@ -103,8 +103,8 @@ sapply(packages,require,character.only=T,quietly=T)
   table(applications$priority_profile,exclude=F)
   
   ## Export:
-  fwrite(programs1,paste0(mainFolder,'/data/example_1/vacancies.csv'))
-  fwrite(applications1,paste0(mainFolder,'/data/example_1/applications.csv'))
+  fwrite(programs1,paste0(mainFolder,'/data/example_1/vacancies_r.csv'))
+  fwrite(applications1,paste0(mainFolder,'/data/example_1/applications_r.csv'))
   rm(applications1,programs1)
 }
 

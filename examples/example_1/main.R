@@ -27,7 +27,7 @@ if(Sys.info()["user"] == 'mds237'){
 }
 
 ## Install and load packages:
-packages <- c("data.table","stringr","SyncRNG")
+packages <- c("data.table","stringr","scales","SyncRNG")
 new_packages <- packages[!(packages %in% installed.packages()[,"Package"])]
 if(length(new_packages)){install.packages(new_packages)}
 sapply(packages,require,character.only=T,quietly=T)
@@ -142,51 +142,19 @@ source(paste0(mainFolder,'/functions/baseBoston.R'),encoding='UTF-8')
   ## Cutoff distribution:
   {
     cutoffs = iters_DA$cutoffs
-    cuts = cutoffs[,.(count=sum(!not_filled),sd=sd(score)),by=.(program_id)]
+    cuts = cutoffs[,.(count=sum(!not_filled),sd=sd(upper_cutoff)),by=.(program_id)]
     
-    ggplot(cutoffs[program_id == 17,],aes(x=score)) +
-      stat_ecdf(geom = "step",pad = T) +
-      scale_x_continuous(breaks = seq(1,5,0.002)) +
+    ggplot(cutoffs[program_id == 44247,],) +
+      stat_ecdf(aes(x=lower_cutoff,color='Lower Cutoff'),geom = "step") +
+      stat_ecdf(aes(x=upper_cutoff,color='Upper Cutoff'),geom = "step") +
+      scale_y_continuous(breaks=seq(0,1,0.1),labels=number_format(suffix='%',scale=100)) +
+      scale_x_continuous(breaks=seq(1,5,0.05)) +
       labs(title = 'Cummulative cutoff distribution',
-           subtitle = 'Program 17',
-           x=NULL,y=NULL) +
+           subtitle = 'Program 44247 - 200 simulations',
+           x='Cutoff distribution',y='Cummulative density',color=NULL) +
       theme_bw() +
-      theme(plot.title.position = 'plot')
-    
-    ggplot(cutoffs[program_id == 28,],aes(x=score)) +
-      stat_ecdf(geom = "step",pad = T) +
-      scale_x_continuous(breaks = seq(1,5,0.01)) +
-      labs(title = 'Cummulative cutoff distribution',
-           subtitle = 'Program 28',
-           x=NULL,y=NULL) +
-      theme_bw() +
-      theme(plot.title.position = 'plot')
-    
-    ggplot(cutoffs[program_id == 119,],aes(x=score)) +
-      stat_ecdf(geom = "step",pad = T) +
-      scale_x_continuous(breaks = seq(1,5,0.01)) +
-      labs(title = 'Cummulative cutoff distribution',
-           subtitle = 'Program 119',
-           x=NULL,y=NULL) +
-      theme_bw() +
-      theme(plot.title.position = 'plot')
-    
-    ggplot(cutoffs[program_id == 30694,],aes(x=score)) +
-      stat_ecdf(geom = "step",pad = T) +
-      scale_x_continuous(breaks = seq(1,5,0.01)) +
-      labs(title = 'Cummulative cutoff distribution',
-           subtitle = 'Program 55759',
-           x=NULL,y=NULL) +
-      theme_bw() +
-      theme(plot.title.position = 'plot')
-    
-    ggplot(cutoffs[program_id == 79065,],aes(x=score)) +
-      stat_ecdf(geom = "step",pad = T) +
-      scale_x_continuous(breaks = seq(1,5,0.2)) +
-      labs(title = 'Cummulative cutoff distribution',
-           subtitle = 'Program 79065',
-           x=NULL,y=NULL) +
-      theme_bw() +
-      theme(plot.title.position = 'plot')
+      theme(plot.title.position = 'plot',
+            legend.position=c(0.1,0.9),
+            legend.background = element_rect(color='black'))
   }
 }

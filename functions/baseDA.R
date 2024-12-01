@@ -50,7 +50,7 @@ baseDA = function(apps=NULL,vacs=NULL,get_wl=T,get_probs=F,iters=1,
     
     ## Save cutoffs:
     if(get_cutoffs == T){
-      cutoffs = getCutoffs(assigned,vacs,cutoffs)
+      cutoffs = getCutoffs(apps2,vacs,assigned,cutoffs,i)
     }
     
     ## Save assignment:
