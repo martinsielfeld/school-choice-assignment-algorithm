@@ -12,13 +12,13 @@ baseSAA = function(apps = NULL,                ## Application DB
                    rand_type = 'py&r'){
   
   ## Load functions:
-  source(paste0(mainFolder,'/src/expandPriorities.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/getCutoffs.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/expandVacs.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/lotteryNum.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/prepStats.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/getProbs.R'),encoding='UTF-8')
-  source(paste0(mainFolder,'/src/DA.R'),encoding='UTF-8')
+  source('src/expandPriorities.R',encoding='UTF-8')
+  source('src/getCutoffs.R',encoding='UTF-8')
+  source('src/expandVacs.R',encoding='UTF-8')
+  source('src/lotteryNum.R',encoding='UTF-8')
+  source('src/prepStats.R',encoding='UTF-8')
+  source('src/getProbs.R',encoding='UTF-8')
+  source('src/getMatch.R',encoding='UTF-8')
   
   ## Validation:
   if(!tiebreak %in% c('applicant','application')){stop('Wrong tiebreak. Valids are "applicant" and "application"')}
@@ -56,7 +56,7 @@ baseSAA = function(apps = NULL,                ## Application DB
     apps2 = lotteryNum(apps2,breaktype=tiebreak,type=rand_type,iterat=iters,seed=iter_seeds[i])
     
     ## Start iteration:
-    assigned = DA(apps2,vacs,maxqid,transfer_capacity)
+    assigned = getMatch(apps2,vacs,maxqid,transfer_capacity)
     
     ## Add original ranking:
     assigned[,iter:=i]

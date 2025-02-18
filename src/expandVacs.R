@@ -1,10 +1,3 @@
-#################
-### Functions ###
-#################
-
-## needed packages: data.table
-
-## Expand vacancies:
 expandVacs = function(vacs = NULL){
   
   if(any(names(vacs) %like% 'quota_')){

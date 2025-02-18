@@ -1,4 +1,4 @@
-DA = function(apps=NULL,vacs=NULL,reg_cap_id=NULL,trans_cap=NULL){
+getMatch = function(apps=NULL,vacs=NULL,reg_cap_id=NULL,trans_cap=NULL){
   
   cat(paste0('\n        Starting DA algorithm'))
   
