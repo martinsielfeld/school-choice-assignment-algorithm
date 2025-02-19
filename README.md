@@ -3,9 +3,9 @@ Last stable release: 2024/09/16<br>
 Author: [Martin Sielfeld](https://github.com/martinsielfeld)<br>
 Contributors:<br>
 
-# Multipurpose Assignment Algorithms
+# School Assignment Algorithms
 
-This repository offers a flexible set of functions to perform students-to-school matching mechanisms, based on a wide range of rules, priotities and quotas specifications. General matching modeles perfomed by the ```baseSAA``` functions includes: 
+The School Assignment Algorithms package (SAA) offers a flexible set of functions to perform students-to-school matching mechanisms, based on a wide range of rules, priotities and quotas specifications. General matching modeles perfomed by the ```baseSAA``` functions includes: 
 
 * The Boston Assignment Mechanism[^1] (Abdulkadiroğlu, A., & Sönmez, T.,2003).
 * The Deferred Acceptance Mechanism [^2] (Gale, D., & Shapley, L. S.,1962).
