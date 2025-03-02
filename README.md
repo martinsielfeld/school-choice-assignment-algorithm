@@ -38,7 +38,7 @@ get_cutoffs | Get cutoffs in each iteration | True <br> False
 get_probs | Get admission probabilities distribution | True <br> False
 get_stats | Get seats statistics distribution | True <br> False
 transfer_capacity | Are applicants from special quotas allowed to also compete in the regular quota? | True <br> False
-tiebreak | Tiebreak level | Applicant <br> Application
+tiebreak | Tiebreak level. If single or multiple tie-breakers at the individual level (STB and MTB) should be applied. | Applicant <br> Application
 rand_type | Use common library to get same results in Python and R? | local <br> py&r
 
 ### baseAMSAA
