@@ -24,28 +24,27 @@ def baseSAA(apps, vacs, iters=1, get_wl=True, get_assignment=True, get_cutoffs=T
     vacs = expandVacs(vacs)
     maxqid = vacs['quota_id'].max()
 
-    print(vacs.shape)
-
-    print("\nStart assignment...")
+    print("Start assignment...")
     assignment = pd.DataFrame()
     cutoffs = pd.DataFrame()
     ratex = pd.DataFrame()
     stats = pd.DataFrame()
     
     for i in range(iters):
-        print(f'\n    Iteration: {i + 1}')
+        print(f'    Iteration: {i + 1}')
         
         # Deep copy to avoid modifying the original during iterations
         apps2 = apps.copy()
         
         # Add tiebreak
         apps2 = lotteryNum(apps2, breaktype=tiebreak, type=rand_type, iterat=i + 1, seed=iter_seeds[i])
-        
+
         # Start iteration
         assigned = getMatch(apps2, vacs, maxqid, transfer_capacity)
-        
+
         # Add original ranking
         assigned['iter'] = i + 1
+        assigned.drop(columns='ranking', inplace=True)
         assigned = assigned.merge(apps[['applicant_id', 'program_id', 'ranking']], on=['applicant_id', 'program_id'])
 
         # Save cutoffs
@@ -75,7 +74,7 @@ def baseSAA(apps, vacs, iters=1, get_wl=True, get_assignment=True, get_cutoffs=T
     if get_cutoffs:
         results['cutoffs'] = cutoffs
     if get_probs:
-        print('\nGet ratex distribution')
+        print('Get ratex distribution')
         # Summarize ratex data here if necessary
         results['ratex'] = ratex
 

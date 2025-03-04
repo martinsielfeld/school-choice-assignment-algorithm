@@ -22,5 +22,7 @@ base_da = applications[['applicant_id', 'grade_id', 'program_id', 'ranking', 'qu
 results_1 = baseSAA(apps=soft_boston, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=1)
 results_2 = baseSAA(apps=base_da, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=1)
 
-# Results can be further analyzed or saved as needed
+# Export:
+results_1['assignment'].to_csv('data/example_3/results_boston_py.csv',index=False)
+results_2['assignment'].to_csv('data/example_3/results_da_py.csv', index=False)
 

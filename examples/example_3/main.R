@@ -50,12 +50,20 @@ source('src/baseSAA.R',encoding='UTF-8')
 {
   ## Soft Boston:
   results_1 = baseSAA(apps=softBoston,vacs=vacancies,get_cutoffs=F,transfer_capacity=F,
-                      iters=100)
+                      iters=1)
   
   ## DA:
   results_2 = baseSAA(apps=baseDA,vacs=vacancies,get_cutoffs=F,transfer_capacity=F,
-                      iters=100)
-  
+                      iters=1)
+}
+
+## Export:
+{
+  fwrite(results_1$assignment,'data/example_3/results_boston_r.csv')
+  fwrite(results_2$assignment,'data/example_3/results_da_r.csv')
+}
+
+{  
   ## Compare results:
   results_1 = results_1$assignment
   results_2 = results_2$assignment
@@ -94,4 +102,3 @@ source('src/baseSAA.R',encoding='UTF-8')
   results_4 = baseSAA(apps=baseDA,vacs=vacancies,get_cutoffs=F,transfer_capacity=F,
                       get_probs=T,get_assignment=F,iters=100)
 }
-
