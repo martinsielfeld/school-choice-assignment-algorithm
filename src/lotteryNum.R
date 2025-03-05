@@ -16,6 +16,7 @@ lotteryNum = function(apps=NULL,type='py&r',breaktype='application',iterat=1,see
   } else if(iterat > 1 | any(is.na(apps$lottery_number)) == T){ ## If any lottery number provided, all new
     
     cat(paste0('\n        Creating random numbers'))
+    apps = apps[order(applicant_id,ranking)]
     if(type == 'py&r'){
       
       v <- 1:nrow(apps)

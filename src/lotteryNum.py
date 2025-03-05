@@ -9,6 +9,7 @@ def lotteryNum(apps, type='py&r', breaktype='application', iterat=1, seed=None):
     if type not in ['py&r', 'local']:
         raise ValueError('Wrong type for lottery numbers')
 
+    apps.sort_values(by=['applicant_id','ranking'], inplace=True)
     if iterat == 1 and not apps['lottery_number'].isna().any():
         print('    Random numbers detected')
     else:

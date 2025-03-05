@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from SyncRNG import SyncRNG
 from expandPriorities import expandPriorities
 from expandVacs import expandVacs
 from getCutoffs import getCutoffs
@@ -13,12 +14,15 @@ from getProbs import getProbs
 def baseSAA(apps, vacs, iters=1, get_wl=True, get_assignment=True, get_cutoffs=True, 
              get_probs=False, get_stats=False, transfer_capacity=False, tiebreak='application', 
              seed=1234, rand_type='py&r'):
+    
     print("\nRandom numbers...")
     if iters == 1:
         iter_seeds = [seed]
     else:
-        np.random.seed(seed)
-        iter_seeds = np.random.choice(range(1, iters * 100), iters, replace=False)
+        a = list(range(1, iters * 100 + 1))
+        b = SyncRNG(seed=seed)
+        iter_seeds = b.shuffle(a)[:iters]
+        del [a, b]
     
     # Expand vacancies once outside the loop
     vacs = expandVacs(vacs)
@@ -78,5 +82,5 @@ def baseSAA(apps, vacs, iters=1, get_wl=True, get_assignment=True, get_cutoffs=T
         # Summarize ratex data here if necessary
         results['ratex'] = ratex
 
-    print('\nEnd of simulations')
+    print('End of simulations')
     return results

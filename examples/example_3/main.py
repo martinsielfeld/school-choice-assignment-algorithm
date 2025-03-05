@@ -19,10 +19,13 @@ soft_boston = applications[['applicant_id', 'grade_id', 'program_id', 'ranking',
 base_da = applications[['applicant_id', 'grade_id', 'program_id', 'ranking', 'quota_id', 'priority_profile_edi']].rename(columns={'priority_profile_edi': 'priority_profile'})
 
 # Execute the assignment algorithms
-results_1 = baseSAA(apps=soft_boston, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=1)
-results_2 = baseSAA(apps=base_da, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=1)
+results_1 = baseSAA(apps=soft_boston, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=100)
+results_2 = baseSAA(apps=base_da, vacs=vacancies, get_cutoffs=False, transfer_capacity=False, iters=100)
+results_3 = baseSAA(apps=soft_boston, vacs=vacancies, get_cutoffs=False, transfer_capacity=True, iters=100)
+results_4 = baseSAA(apps=base_da, vacs=vacancies, get_cutoffs=False, transfer_capacity=True, iters=100)
 
 # Export:
-results_1['assignment'].to_csv('data/example_3/results_boston_py.csv',index=False)
-results_2['assignment'].to_csv('data/example_3/results_da_py.csv', index=False)
-
+results_1['assignment'].to_csv('data/example_3/results_boston_py_v1.csv',index=False)
+results_2['assignment'].to_csv('data/example_3/results_da_py_v1.csv', index=False)
+results_3['assignment'].to_csv('data/example_3/results_boston_py_v2.csv',index=False)
+results_4['assignment'].to_csv('data/example_3/results_da_py_v2.csv', index=False)
